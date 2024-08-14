@@ -8,5 +8,5 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - run: ./script.ps1 -FilePath ${{ inputs.FilePath }}
+    - run: ./pmtk.ps1 -FilePath ${{ inputs.FilePath }}
       shell: pwsh
