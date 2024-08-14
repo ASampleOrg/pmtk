@@ -8,7 +8,5 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - run: ./script.ps1
+    - run: ./script.ps1 -FilePath ${{ inputs.FilePath }}
       shell: pwsh
-      with:
-        FilePath: ${{ inputs.FilePath }}
