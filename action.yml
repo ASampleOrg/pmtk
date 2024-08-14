@@ -14,5 +14,5 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
 
-    - run: pmtk.ps1 -ConfigFilePath ${{ inputs.FilePath }}
+    - run: run.ps1 -ConfigFilePath ${{ inputs.FilePath }}
       shell: pwsh
