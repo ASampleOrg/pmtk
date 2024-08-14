@@ -1,0 +1,14 @@
+name: 'Run PMTK script'
+description: 'A custom GitHub Action that runs the PMTK powershell script'
+inputs:
+  FilePath:
+    description: 'An input for the custom action'
+    required: true
+    default: 'default value'
+runs:
+  using: 'composite'
+  steps:
+    - run: ./script.ps1
+      shell: pwsh
+      with:
+        FilePath: ${{ inputs.FilePath }}
