@@ -8,5 +8,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - run: ./pmtk.ps1 -FilePath ${{ inputs.FilePath }}
+    - name: Set GitHub Path
+      run: echo "$GITHUB_ACTION_PATH" >> $GITHUB_PATH
+      shell: bash
+      env:
+        GITHUB_ACTION_PATH: ${{ github.action_path }}
+
+    - run: pmtk.ps1 -FilePath ${{ inputs.FilePath }}
       shell: pwsh
