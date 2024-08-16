@@ -16,12 +16,11 @@ function New-IssueSyncRun {
     param (
         [Parameter()]
         [array]
-        $ConfigData
+        $ConfigData,
+        [Parameter()]
+        [String]
+        $WorkingDirectory
     )
-
-    # Get the path above the module directory
-    $parentDirectory = Split-Path -Path $PSScriptRoot -Parent
-
 
     # for each row in the config file, create a new issue sync run
     foreach ($row in $ConfigData) {
@@ -34,11 +33,9 @@ function New-IssueSyncRun {
         # look for a directory with the same name as the customer
         # if it exists get the latest .md file that doesn't end with a _synced suffix in that directory 
 
-        
+        $customerDirectory = "$WorkingDirectory/$customer"
+        Write-Output "Looking for update file for $customer in directory: $customerDirectory"
 
-        Write-Output "Looking for update file for $customer in directory: $parentDirectory"
-
-        $customerDirectory = "$parentDirectory/$customer"
         if (-Not (Test-Path -Path $customerDirectory)) {
             throw "Customer directory not found: $customerDirectory"
         }
@@ -53,15 +50,13 @@ function New-IssueSyncRun {
         }
 
         # using the gh cli create a comment on the service issue and customer issue with the contents of the .md file
-
         Write-Output "Creating issue sync run for $customer, service issue $serviceIssue, customer issue $customerIssue"
         Write-Output "Using update file: $($latestCustomerUpdate.FullName)"
-        $serviceResult = & gh issue comment $serviceIssue -F $($latestCustomerUpdate.FullName) -R $serviceIssueRepo 
 
+        $serviceResult = & gh issue comment $serviceIssue -F $($latestCustomerUpdate.FullName) -R $serviceIssueRepo 
         Write-Output "Service result: $serviceResult"
 
         $customerResult = & gh issue comment $customerIssue -F $($latestCustomerUpdate.FullName) -R $customerIssueRepo
-
         Write-Output "Customer result: $customerResult"
     }
 
