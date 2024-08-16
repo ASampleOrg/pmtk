@@ -9,8 +9,12 @@ param (
 # Import the local module
 Import-Module -Name $PSScriptRoot/pmtk-module/pmtk.psm1
 
-$config = Get-ConfigAsPSObject -filePath $ConfigFilePath
+$config = Get-CsvConfig -filePath $ConfigFilePath
 
 Write-Output "Config file loaded: $ConfigFilePath"
 Write-Output "Config values:"
-Write-Output "$(ConvertTo-Json $config)"
+$config | Format-Table
+
+# for each row in the config file create a new issue sync run
+
+New-IssueSyncRun -ConfigData $config

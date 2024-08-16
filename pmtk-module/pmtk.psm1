@@ -1,27 +1,59 @@
-function Get-ConfigAsPSObject {
+function Get-CsvConfig {
     param(
         [string] $filePath
     )
 
     if (-Not (Test-Path -Path $filePath)) {
-        throw "Configuration file not found: $filePath"
+        throw "CSV file not found: $filePath"
     }
 
-    $configContent = Get-Content -Path $filePath
-    $configObject = [PSCustomObject]@{}
+    $csvContent = Import-Csv -Path $filePath
+    return $csvContent
+}
 
-    foreach ($line in $configContent) {
-        if ($line -match '^\s*#') {
-            continue  # Skip comment lines
+function New-IssueSyncRun {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [array]
+        $ConfigData
+    )
+
+    # for each row in the config file, create a new issue sync run
+    foreach ($row in $ConfigData) {
+        $customer = $row.customer
+        $serviceIssue = $row.service_issue_id
+        $serviceIssueRepo = $row.service_issue_repo
+        $customerIssue = $row.customer_issue_id
+        $customerIssueRepo = $row.customer_issue_repo
+    
+        # look for a directory with the same name as the customer
+        # if it exists get the latest .md file that doesn't end with a _synced suffix in that directory 
+
+        $customerDirectory = "$PSScriptRoot/$customer"
+        if (-Not (Test-Path -Path $customerDirectory)) {
+            throw "Customer directory not found: $customerDirectory"
         }
 
-        if ($line -match '^\s*$') {
-            continue  # Skip empty lines
+        $latestCustomerUpdate = Get-ChildItem -Path $customerDirectory -Filter "*.md" |
+        Where-Object { $_.Name -notmatch '_synced\.md$' } |
+        Sort-Object -Property LastWriteTime -Descending |
+        Select-Object -First 1
+
+        if ($null -eq $latestCustomerUpdate) 
+            throw "No suitable update .md file found in directory: $customerDirectory"
         }
 
-        $key, $value = $line -split '=', 2
-        $configObject | Add-Member -MemberType NoteProperty -Name $key.Trim() -Value $value.Trim()
-    }
+        # using the gh cli create a comment on the service issue and customer issue with the contents of the .md file
 
-    return $configObject
+        Write-Output "Creating issue sync run for $customer, service issue $serviceIssue, customer issue $customerIssue"
+        Write-Output "Using update file: $($latestCustomerUpdate.FullName)"
+        $serviceResult = & gh issue comment $serviceIssue -F $($latestCustomerUpdate.FullName) -R $serviceIssueRepo 
+
+        Write-Output "Service result: $serviceResult"
+
+        $customerResult = & gh issue comment $customerIssue -F $($latestCustomerUpdate.FullName) -R $customerIssueRepo
+
+        Write-Output "Customer result: $customerResult"
+
 }
