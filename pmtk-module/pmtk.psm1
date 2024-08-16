@@ -55,5 +55,4 @@ function New-IssueSyncRun {
         $customerResult = & gh issue comment $customerIssue -F $($latestCustomerUpdate.FullName) -R $customerIssueRepo
 
         Write-Output "Customer result: $customerResult"
-
-}
+    }
