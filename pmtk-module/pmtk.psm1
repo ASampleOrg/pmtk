@@ -19,6 +19,10 @@ function New-IssueSyncRun {
         $ConfigData
     )
 
+    # Get the path above the module directory
+    $parentDirectory = Split-Path -Path $PSScriptRoot -Parent
+
+
     # for each row in the config file, create a new issue sync run
     foreach ($row in $ConfigData) {
         $customer = $row.customer
@@ -30,7 +34,11 @@ function New-IssueSyncRun {
         # look for a directory with the same name as the customer
         # if it exists get the latest .md file that doesn't end with a _synced suffix in that directory 
 
-        $customerDirectory = "$PSScriptRoot/$customer"
+        
+
+        Write-Output "Looking for update file for $customer in directory: $parentDirectory"
+
+        $customerDirectory = "$parentDirectory/$customer"
         if (-Not (Test-Path -Path $customerDirectory)) {
             throw "Customer directory not found: $customerDirectory"
         }
@@ -40,7 +48,7 @@ function New-IssueSyncRun {
         Sort-Object -Property LastWriteTime -Descending |
         Select-Object -First 1
 
-        if ($null -eq $latestCustomerUpdate) 
+        if ($null -eq $latestCustomerUpdate) {
             throw "No suitable update .md file found in directory: $customerDirectory"
         }
 
@@ -56,3 +64,8 @@ function New-IssueSyncRun {
 
         Write-Output "Customer result: $customerResult"
     }
+
+    # Update the .md file to have a _synced suffix
+
+    $latestCustomerUpdate | Rename-Item -NewName { $_.Name -replace '\.md$', '_synced.md' }
+}

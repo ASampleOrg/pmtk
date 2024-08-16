@@ -5,6 +5,9 @@ inputs:
     description: 'An input for the custom action'
     required: true
     default: 'default value'
+  ISSUE_PAT:
+    description: 'A personal access token for creating issue comments'
+    required: true
 runs:
   using: 'composite'
   steps:
@@ -16,3 +19,5 @@ runs:
 
     - run: run.ps1 -ConfigFilePath ${{ inputs.FilePath }}
       shell: pwsh
+      env:
+        GH_TOKEN: ${{ inputs.ISSUE_PAT }}
