@@ -62,5 +62,9 @@ function New-IssueSyncRun {
 
     # Update the .md file to have a _synced suffix
 
-    $latestCustomerUpdate | Rename-Item -NewName { $_.Name -replace '\.md$', '_synced.md' }
+    Write-Output "Renaming update file: $($latestCustomerUpdate.FullName)"
+    # Update the .md file to have a _synced suffix
+    $newFileName = $latestCustomerUpdate.FullName -replace '\.md$', '_synced.md'
+    Write-Output "Renaming update file: $($latestCustomerUpdate.FullName) to $newFileName"
+    Rename-Item -Path $latestCustomerUpdate.FullName -NewName $newFileName
 }
