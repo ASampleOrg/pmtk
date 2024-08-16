@@ -2,9 +2,11 @@ name: 'Run PMTK script'
 description: 'A custom GitHub Action that runs the PMTK powershell script'
 inputs:
   FilePath:
-    description: 'An input for the custom action'
+    description: 'The path to the config file including the name'
     required: true
-    default: 'default value'
+  WorkingDirectory:
+    description: 'The parent directory of the customer update directories'
+    required: true  
   ISSUE_PAT:
     description: 'A personal access token for creating issue comments'
     required: true
@@ -17,7 +19,7 @@ runs:
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
 
-    - run: run.ps1 -ConfigFilePath ${{ inputs.FilePath }}
+    - run: run.ps1 -ConfigFilePath ${{ inputs.FilePath }} -WorkingDirectory ${{ inputs.WorkingDirectory }}
       shell: pwsh
       env:
         GH_TOKEN: ${{ inputs.ISSUE_PAT }}
