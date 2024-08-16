@@ -2,7 +2,10 @@
 param (
     [Parameter()]
     [String]
-    $ConfigFilePath
+    $ConfigFilePath,
+    [Parameter()]
+    [String]
+    $WorkingDirectory
 )
 
 
@@ -17,4 +20,4 @@ $config | Format-Table
 
 # for each row in the config file create a new issue sync run
 
-New-IssueSyncRun -ConfigData $config
+New-IssueSyncRun -ConfigData $config -WorkingDirectory $WorkingDirectory
