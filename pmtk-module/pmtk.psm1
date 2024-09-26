@@ -86,11 +86,11 @@ function Set-BurnDownChart {
     )
 
     $mermaidTemplate = @"
-        ``````mermaid
-            pie title {Customer} Hours Burndown from {HoursTotal} hours
-                "Hours Done" : {HoursDone}
-                "Hours Remaining" : {HoursRemaining}
-        ``````
+``````mermaid
+    pie title {Customer} Hours Burndown from {HoursTotal} hours
+        "Hours Done" : {HoursDone}
+        "Hours Remaining" : {HoursRemaining}
+``````
 "@
 
     # using the gh cli get the markdown template for the mermaid chart, update the hours total with the burn down rate and post as a comment on the issue
@@ -102,9 +102,9 @@ function Set-BurnDownChart {
         $serviceIssueRepo = $item.service_issue_repo
         $customerIssue = $item.customer_issue_id
         $customerIssueRepo = $item.customer_issue_repo
-        $burnDownTotal = $item.burn_down_total
+        $burnDownTotal = $item.burn_total
         $burnDownRate = $item.burn_down_rate
-        $burnDownMax = $item.burn_down_max
+        $burnDownMax = $item.burn_max
 
         # chart variables
         $date = Get-Date
