@@ -28,7 +28,7 @@ Write-Output "Updating config file to add burn_down_rate to burn_total column fo
 $updatedConfig = $config | ForEach-Object {
     $row = $_
     if ($row.include_burn_down -eq "true") {
-        $row.burn_total = $row.burn_total + $row.burn_down_rate
+        [int]$row.burn_total = [int]$row.burn_total + [int]$row.burn_down_rate
     }
     $row
 }
