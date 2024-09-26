@@ -102,14 +102,14 @@ function Set-BurnDownChart {
         $serviceIssueRepo = $item.service_issue_repo
         $customerIssue = $item.customer_issue_id
         $customerIssueRepo = $item.customer_issue_repo
-        $burnDownTotal = $item.burn_total
-        $burnDownRate = $item.burn_down_rate
-        $burnDownMax = $item.burn_max
+        [int]$burnDownTotal = $item.burn_total
+        [int]$burnDownRate = $item.burn_down_rate
+        [int]$burnDownMax = $item.burn_max
 
         # chart variables
         $date = Get-Date
-        # calculate the current burn down by adding the rate to the total
-        $currentBurnDown = $burnDownTotal + $burnDownRate
+        # calculate the current burn down by adding the rate to the total as an integer
+        $currentBurnDown = [int]($burnDownTotal + $burnDownRate)
 
 
         $mermaidChart = $mermaidTemplate -replace '{Customer}', $customer `
