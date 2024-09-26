@@ -1,2 +1,2 @@
-customer,service_issue_id,service_issue_repo,customer_issue_id,customer_issue_repo
-ASampleOrg,29,ASampleOrg/central-workflows,1,ASampleOrg/pmtk
+customer,service_issue_id,service_issue_repo,customer_issue_id,customer_issue_repo,include_burn_down,burn_down_rate,burn_total,burn_max
+ASampleOrg,29,ASampleOrg/central-workflows,1,ASampleOrg/pmtk,true,8,0,40

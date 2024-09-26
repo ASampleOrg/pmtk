@@ -29,6 +29,7 @@ function New-IssueSyncRun {
         $serviceIssueRepo = $row.service_issue_repo
         $customerIssue = $row.customer_issue_id
         $customerIssueRepo = $row.customer_issue_repo
+        $includeBurnDownChart = $row.include_burn_down_chart
     
         # look for a directory with the same name as the customer
         # if it exists get the latest .md file that doesn't end with a _synced suffix in that directory 
@@ -58,6 +59,11 @@ function New-IssueSyncRun {
 
         $customerResult = & gh issue comment $customerIssue -F $($latestCustomerUpdate.FullName) -R $customerIssueRepo
         Write-Output "Customer result: $customerResult"
+
+        # if the includeBurnDownChart flag is set, update the service issue with the burn down chart
+        if ($includeBurnDownChart -eq $true) {
+            Write-Output "Updating service issue $serviceIssue with burn down chart"
+            Set-BurnDownChart -CustomerData $row 
     }
 
     # Update the .md file to have a _synced suffix
@@ -67,4 +73,57 @@ function New-IssueSyncRun {
     $newFileName = $latestCustomerUpdate.FullName -replace '\.md$', '_synced.md'
     Write-Output "Renaming update file: $($latestCustomerUpdate.FullName) to $newFileName"
     Rename-Item -Path $latestCustomerUpdate.FullName -NewName $newFileName
+}
+}
+
+
+function Set-BurnDownChart {
+    [CmdletBinding()]
+    param (
+        [Parameter()]
+        [array]
+        $CustomerData
+    )
+
+    $mermaidTemplate = @"
+    \`\`\`mermaid
+    pie title {Customer} - {Date} - Hours Total: {HoursTotal}
+        Hours Done: {HoursDone}
+        Hours Remaining: {HoursRemaining}
+    \`\`\`    
+"@
+
+    # using the gh cli get the markdown template for the mermaid chart, update the hours total with the burn down rate and post as a comment on the issue
+
+
+    foreach ($item in $CustomerData) {
+        $customer = $item.customer
+        $serviceIssue = $item.service_issue_id
+        $serviceIssueRepo = $item.service_issue_repo
+        $customerIssue = $item.customer_issue_id
+        $customerIssueRepo = $item.customer_issue_repo
+        $burnDownTotal = $item.burn_down_total
+        $burnDownRate = $item.burn_down_rate
+        $burnDownMax = $item.burn_down_max
+
+        # chart variables
+        $date = Get-Date
+        # calculate the current burn down by adding the rate to the total
+        $currentBurnDown = $burnDownTotal + $burnDownRate
+
+
+        $mermaidChart = $mermaidTemplate -replace '{Customer}', $customer `
+                                         -replace '{Date}', $date `
+                                         -replace '{HoursTotal}', $burnDownMax `
+                                         -replace '{HoursDone}', $currentBurnDown `
+                                         -replace '{HoursRemaining}', ($burnDownMax - $currentBurnDown)       
+
+        Write-Output "Updating service issue $serviceIssue with burn down chart"                                    
+        $result = & gh issue comment $serviceIssue -b $mermaidTemplate -R $serviceIssueRepo
+        Write-Output "Service result: $result"
+
+        Write-Output "Updating customer issue $customerIssue with burn down chart"
+        $result = & gh issue comment $customerIssue -b $mermaidTemplate -R $customerIssueRepo
+        Write-Output "Customer result: $result"
+    }
 }
