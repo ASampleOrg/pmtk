@@ -119,11 +119,11 @@ function Set-BurnDownChart {
                                          -replace '{HoursRemaining}', ($burnDownMax - $currentBurnDown)       
 
         Write-Output "Updating service issue $serviceIssue with burn down chart"                                    
-        $result = & gh issue comment $serviceIssue -b $mermaidTemplate -R $serviceIssueRepo
+        $result = & gh issue comment $serviceIssue -b $mermaidChart -R $serviceIssueRepo
         Write-Output "Service result: $result"
 
         Write-Output "Updating customer issue $customerIssue with burn down chart"
-        $result = & gh issue comment $customerIssue -b $mermaidTemplate -R $customerIssueRepo
+        $result = & gh issue comment $customerIssue -b $mermaidChart -R $customerIssueRepo
         Write-Output "Customer result: $result"
     }
 }
