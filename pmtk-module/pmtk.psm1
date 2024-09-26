@@ -29,7 +29,7 @@ function New-IssueSyncRun {
         $serviceIssueRepo = $row.service_issue_repo
         $customerIssue = $row.customer_issue_id
         $customerIssueRepo = $row.customer_issue_repo
-        $includeBurnDownChart = $row.include_burn_down_chart
+        $includeBurnDownChart = $row.include_burn_down
     
         # look for a directory with the same name as the customer
         # if it exists get the latest .md file that doesn't end with a _synced suffix in that directory 
